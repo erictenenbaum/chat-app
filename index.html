@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Socket.IO Chat App</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font: 13px Helvetica, Arial;
+    }
+
+    #chat-form {
+        background: #000;
+        padding: 3px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+    form input {
+        border: 0;
+        padding: 10px;
+        width: 90%;
+        margin-right: .5%;
+    }
+
+    form button {
+        width: 9%;
+        background: rgb(130, 224, 255);
+        border: none;
+        padding: 10px;
+    }
+
+    #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #messages li {
+        padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+        background: #eee;
+    }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li id="chat">
+            <ul id="messages"></ul>
+            <form id="chat-form" action="">
+                <input id="m" autocomplete="off" />
+                <button>Send</button>
+            </form>
+        </li>
+    </ul>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">User Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">User Name:</label>
+                            <input type="text" class="form-control" id="user-name">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="user-button btn btn-primary">Send message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+    $(function() {
+        var socket = io();
+
+        $("#exampleModal").modal("show");
+
+        $(".user-button").on("click", function() {
+            var user = $("#user-name").val().trim();
+
+            socket.emit('new user', user);
+
+            $("#exampleModal").modal("hide");
+        });
+
+        $('form').submit(function() {
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+            return false;
+        });
+        socket.on('chat message', function(msg) {
+            $('#messages').append($('<li>').text(msg));
+        });
+    });
+    </script>
+</body>
+
+</html>
