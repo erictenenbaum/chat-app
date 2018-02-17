@@ -41,6 +41,7 @@
         list-style-type: none;
         margin: 0;
         padding: 0;
+        font-size: 25px;
     }
 
     #messages li {
@@ -95,6 +96,18 @@
     $(function() {
         var socket = io();
 
+        function updateScroll() {
+            var element = $("#messages");
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function continiousUpdate(){
+            setInterval(updateScroll, 1000);
+            setInterval(continiousUpdate, 1000);
+        }
+
+        
+
         $("#exampleModal").modal("show");
 
         $(".user-button").on("click", function() {
@@ -113,6 +126,8 @@
         socket.on('chat message', function(msg) {
             $('#messages').append($('<li>').text(msg));
         });
+
+        continiousUpdate();
     });
     </script>
 </body>
