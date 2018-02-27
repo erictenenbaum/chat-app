@@ -11,30 +11,46 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');  
 });
 
-io.on('connection', function(socket) {
+
+app.post("/chat", function(req, res){
+    console.log(req.body)
+    res.json(req.body);
+})
+
+  io.on('connection', function(socket) {
+
+    
+
     var addedUser = false;
 
     socket.on('new user', function(newUser) {
+        console.log(newUser);
         if (addedUser) return;
-        socket.username = newUser;
+        
+        socket.username = newUser.user;
+        socket.room = newUser.room;
+        socket.join(socket.room);
         
         addedUser = true;     
 
-        console.log(newUser + " Connected");
-    })
+        console.log(newUser.user + " Connected");
+
+    });
 
     socket.on('chat message', function(msg) {
-        io.emit('chat message', (socket.username + ": " + msg));
-        console.log(socket.username + ": " + msg);
+        io.to(socket.room).emit('chat message', (socket.username + ": " + msg));
+        console.log(socket.username + ": " + msg);        
     });
 
     socket.on('disconnect', function() {
         console.log(socket.username, ' disconnected');
     });
 });
+
+
 
 
 http.listen(PORT, function() {
